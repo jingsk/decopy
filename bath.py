@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[17]:
+# In[5]:
 
 
 import numpy as np
@@ -10,8 +10,10 @@ from ase.io import read
 from ase.visualize import view
 from wrapcube import cleanUp
 from ase.data.isotopes import download_isotope_data
-from ase.symbols import string2symbols, symbols2numbers
+#use like this isotopes[6][12]['composition'] gives 0.989
 isotopes = download_isotope_data()
+from ase.symbols import string2symbols, symbols2numbers
+
 
 #usage guide
 #SWCNT=bath('CONTCAR')
@@ -22,27 +24,43 @@ class bath:
     #supercell a tuple for repeating unit cell in x,y,z 
     def __init__(self, fname,supercell, r_cutoff=0.0):
         #wrap and center if vacuum exists
+        #TODO: create a clean supercell with an origin at the center (low priority)
         self.atoms=cleanUp(read(fname))*supercell
         #for atom species in atoms get isotope abundance data
         self.spin_table = get_spin_table(self.atoms)
         #randomly generate spin bath geometry based on % abundance
         #df of symbol (~p), x, y, z, isotope (n+p), nuclear_spin (I), distance
         self.bath_geometry= generate_spin_sites(self.atoms,self.spin_table)
+        #TODO: determine spin site (sp3 carbon site 
+        #(is this possible or do we need to ask user for e- spin site?))
         
-    #
+#for present atomic species get isotope data and return
+#a DataFrame with atomic number, atomic mass, percent abundance, nuclear_spin
 def get_spin_table(atoms):
 #isotope_df=pd.DataFrame({})
     #atoms=self.atoms
     isotope_dfs=[]
+    #per atomic species do:
     for atom in get_unique_atomic_species(atoms):
+        #create Dataframe of isotops
         atom_isotope_df=pd.DataFrame(isotopes[atom]).T
+        # add atomic_number
         atom_isotope_df.loc[:,'atomic_number']=atom
+        #remove unnatural isotopes 
         atom_isotope_df=atom_isotope_df[atom_isotope_df.composition>0]
         #isotope_df.index.name='num_p+n'
-        atom_isotope_df.loc[:,'nuclear_spin']=atom=get_nuclear_spin(atom_isotope_df.index-atom,atom)
+        #I=(n-p)/2
+        atom_isotope_df.loc[:,'nuclear_spin']=get_nuclear_spin(atom_isotope_df.index-atom,atom)
         #atom_isotope_df=atom_isotope_df[is_spin_active(atom_isotope_df.nuclear_spin)]
+        #append for a grand df
         isotope_dfs.append(atom_isotope_df)
+    #concat all atomic species
     return pd.concat(isotope_dfs)
+
+#return a DataFrame of spin active sites inside a cutoff radius
+#TODO: add an option to input a cutoff radius, add input for specifying a spin site as a point
+#DataFrame columns include: atomic symbol, isotope,
+#x,y,z, nuclear spin(I), and distance from a point
 def generate_spin_sites(atoms,spin_table):
     #atoms=self.atoms
     #spin_table=self.spin_table
@@ -53,26 +71,12 @@ def generate_spin_sites(atoms,spin_table):
     spin_active_positions_list=[]
     #loop through elements in atomic positions
     for species in np.unique(positions.symbol):
-        #dataframe of positions of the atomic species
-        species_positions=positions[positions.symbol==species]
         #get atomic number
         atomic_number=symbols2numbers(species)[0]
-        #spin_table of the atomic species
-        atom_isotope_df=spin_table[spin_table.atomic_number==atomic_number]
-        #create a column in the df of randomly generated numbers from 0 to 1
-        species_positions.loc[:,'rand']=np.random.rand(species_positions.shape[0])
-        #generate isotope condition
-        #this works like this: if X-12, X-13, X-14 has [0.1,0.2,0.7] composition
-        #starting with all X-12, we assign isotope with rand>0.1 to X-13, rand>0.3 to X-14 
-        isotope_condition=np.cumsum(np.array(atom_isotope_df.composition))
-        #initial assignment
-        species_positions.loc[:,'isotope']=atom_isotope_df.index[0]
-        #in case there's only one isotope then do nothing
-        if atom_isotope_df.index.size >1:
-            #assign isotope based on abundance condition
-            for i in np.arange(1,atom_isotope_df.index.size):
-                species_positions.loc[species_positions.rand>isotope_condition[i-1], "isotope"]=atom_isotope_df.index[i]
-        species_positions.drop('rand', axis=1, inplace=True)
+        #feed in spin_table of the atomic species
+        #and dataframe of positions of the atomic species
+        #to assign randomly generated isotope
+        species_positions=assign_isotopes(positions[positions.symbol==species],spin_table[spin_table.atomic_number==atomic_number])
         #calculate nuclear spin from (p-n)/2
         species_positions.loc[:,'nuclear_spin']=get_nuclear_spin(species_positions.isotope-atomic_number,atomic_number)
         #remove nuclear spin inactive sites
@@ -100,24 +104,41 @@ def get_distance_from_point(positions,point=[0,0,0]):
 def within_r_cutoff(distance,r_cutoff=100):
     return distance <r_cutoff
 
-#SWCNT=bath('CONTCAR_NO2',(1,1,3))
-#SWCNT.bath_geometry
+def assign_isotopes(positions,isotope_df):
+    #create a column in the df of randomly generated numbers from 0 to 1
+    positions.loc[:,'rand']=np.random.rand(positions.shape[0])
+    #generate isotope condition
+    #this works like this: if X-12, X-13, X-14 has [0.1,0.2,0.7] composition
+    #starting with all X-12, we assign isotope with rand>0.1 to X-13, rand>0.3 to X-14 
+    isotope_condition=np.cumsum(np.array(isotope_df.composition))
+    #initial assignment
+    positions.loc[:,'isotope']=isotope_df.index[0]
+    #in case there's only one isotope then do nothing
+    if isotope_df.index.size >1:
+        #assign isotope based on abundance condition
+        for i in np.arange(1,isotope_df.index.size):
+            positions.loc[positions.rand>isotope_condition[i-1], "isotope"]=isotope_df.index[i]
+    positions.drop('rand', axis=1, inplace=True)
+    return positions
+
+SWCNT=bath('CONTCAR_NO2',(1,1,3))
+SWCNT.bath_geometry
 
 
-# In[49]:
+# In[2]:
 
 
 #view(SWCNT.atoms)
 
 
-# In[23]:
+# In[3]:
 
 
 #atoms=read('CONTCAR_NO2')
 #atoms*(1,1,3)
 
 
-# In[24]:
+# In[4]:
 
 
 #atoms.positions
