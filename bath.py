@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[17]:
+
+
 import numpy as np
 import pandas as pd
 from ase.io import read
@@ -30,10 +36,10 @@ def get_spin_table(atoms):
     isotope_dfs=[]
     for atom in get_unique_atomic_species(atoms):
         atom_isotope_df=pd.DataFrame(isotopes[atom]).T
-        atom_isotope_df['atomic_number']=atom
+        atom_isotope_df.loc[:,'atomic_number']=atom
         atom_isotope_df=atom_isotope_df[atom_isotope_df.composition>0]
         #isotope_df.index.name='num_p+n'
-        atom_isotope_df['nuclear_spin']=get_nuclear_spin(atom_isotope_df.index-atom,atom)
+        atom_isotope_df.loc[:,'nuclear_spin']=atom=get_nuclear_spin(atom_isotope_df.index-atom,atom)
         #atom_isotope_df=atom_isotope_df[is_spin_active(atom_isotope_df.nuclear_spin)]
         isotope_dfs.append(atom_isotope_df)
     return pd.concat(isotope_dfs)
@@ -54,13 +60,13 @@ def generate_spin_sites(atoms,spin_table):
         #spin_table of the atomic species
         atom_isotope_df=spin_table[spin_table.atomic_number==atomic_number]
         #create a column in the df of randomly generated numbers from 0 to 1
-        species_positions['rand']=np.random.rand(species_positions.shape[0])
+        species_positions.loc[:,'rand']=np.random.rand(species_positions.shape[0])
         #generate isotope condition
         #this works like this: if X-12, X-13, X-14 has [0.1,0.2,0.7] composition
         #starting with all X-12, we assign isotope with rand>0.1 to X-13, rand>0.3 to X-14 
         isotope_condition=np.cumsum(np.array(atom_isotope_df.composition))
         #initial assignment
-        species_positions['isotope']=atom_isotope_df.index[0]
+        species_positions.loc[:,'isotope']=atom_isotope_df.index[0]
         #in case there's only one isotope then do nothing
         if atom_isotope_df.index.size >1:
             #assign isotope based on abundance condition
@@ -68,11 +74,11 @@ def generate_spin_sites(atoms,spin_table):
                 species_positions.loc[species_positions.rand>isotope_condition[i-1], "isotope"]=atom_isotope_df.index[i]
         species_positions.drop('rand', axis=1, inplace=True)
         #calculate nuclear spin from (p-n)/2
-        species_positions['nuclear_spin']=get_nuclear_spin(species_positions.isotope-atomic_number,atomic_number)
+        species_positions.loc[:,'nuclear_spin']=get_nuclear_spin(species_positions.isotope-atomic_number,atomic_number)
         #remove nuclear spin inactive sites
         species_positions=species_positions[is_spin_active(species_positions.nuclear_spin)]
         #find distance from electron spin site (assuming at 0,0,0)
-        species_positions['distance']=get_distance_from_point(species_positions[['x','y','z']])
+        species_positions.loc[:,'distance']=get_distance_from_point(species_positions[['x','y','z']])
         #remove sites beyond r_cutoff
         species_positions=species_positions[within_r_cutoff(species_positions.distance)]
         spin_active_positions_list.append(species_positions)
@@ -93,3 +99,26 @@ def get_distance_from_point(positions,point=[0,0,0]):
 #r_cutoff in angstrom
 def within_r_cutoff(distance,r_cutoff=100):
     return distance <r_cutoff
+
+#SWCNT=bath('CONTCAR_NO2',(1,1,3))
+#SWCNT.bath_geometry
+
+
+# In[49]:
+
+
+#view(SWCNT.atoms)
+
+
+# In[23]:
+
+
+#atoms=read('CONTCAR_NO2')
+#atoms*(1,1,3)
+
+
+# In[24]:
+
+
+#atoms.positions
+
