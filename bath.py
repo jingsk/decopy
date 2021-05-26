@@ -20,9 +20,7 @@ from ase.symbols import string2symbols, symbols2numbers
 #SWCNT.bath_geometry
 
 class bath:
-    #fname is file name to read
-    #supercell a tuple for repeating unit cell in x,y,z 
-    def __init__(self, fname,supercell, r_cutoff=0.0):
+    def __init__(self, fname: str,supercell: tuple = (1,1,1), r_cutoff: float=0.0):
         #wrap and center if vacuum exists
         #TODO: create a clean supercell with an origin at the center (low priority)
         self.atoms=cleanUp(read(fname))*supercell
@@ -37,24 +35,16 @@ class bath:
 #for present atomic species get isotope data and return
 #a DataFrame with atomic number, atomic mass, percent abundance, nuclear_spin
 def get_spin_table(atoms):
-#isotope_df=pd.DataFrame({})
-    #atoms=self.atoms
     isotope_dfs=[]
-    #per atomic species do:
     for atom in get_unique_atomic_species(atoms):
-        #create Dataframe of isotops
         atom_isotope_df=pd.DataFrame(isotopes[atom]).T
         # add atomic_number
         atom_isotope_df.loc[:,'atomic_number']=atom
         #remove unnatural isotopes 
         atom_isotope_df=atom_isotope_df[atom_isotope_df.composition>0]
-        #isotope_df.index.name='num_p+n'
         #I=(n-p)/2
         atom_isotope_df.loc[:,'nuclear_spin']=get_nuclear_spin(atom_isotope_df.index-atom,atom)
-        #atom_isotope_df=atom_isotope_df[is_spin_active(atom_isotope_df.nuclear_spin)]
-        #append for a grand df
         isotope_dfs.append(atom_isotope_df)
-    #concat all atomic species
     return pd.concat(isotope_dfs)
 
 #return a DataFrame of spin active sites inside a cutoff radius
@@ -62,14 +52,11 @@ def get_spin_table(atoms):
 #DataFrame columns include: atomic symbol, isotope,
 #x,y,z, nuclear spin(I), and distance from a point
 def generate_spin_sites(atoms,spin_table):
-    #atoms=self.atoms
-    #spin_table=self.spin_table
-    #make xyz like df
+    #make xyz-format df
     positions=pd.concat([pd.DataFrame(atoms.get_chemical_symbols(),columns=['symbol']), 
                pd.DataFrame(atoms.get_positions(),columns=['x','y','z'])],
                axis=1)
     spin_active_positions_list=[]
-    #loop through elements in atomic positions
     for species in np.unique(positions.symbol):
         #get atomic number
         atomic_number=symbols2numbers(species)[0]
@@ -105,7 +92,7 @@ def within_r_cutoff(distance,r_cutoff=100):
     return distance <r_cutoff
 
 def assign_isotopes(positions,isotope_df):
-    #create a column in the df of randomly generated numbers from 0 to 1
+    #create randomly generated numbers from 0 to 1
     positions.loc[:,'rand']=np.random.rand(positions.shape[0])
     #generate isotope condition
     #this works like this: if X-12, X-13, X-14 has [0.1,0.2,0.7] composition
@@ -120,6 +107,7 @@ def assign_isotopes(positions,isotope_df):
             positions.loc[positions.rand>isotope_condition[i-1], "isotope"]=isotope_df.index[i]
     positions.drop('rand', axis=1, inplace=True)
     return positions
+
 
 SWCNT=bath('CONTCAR_NO2',(1,1,3))
 SWCNT.bath_geometry
