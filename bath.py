@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[5]:
+# In[1]:
 
 
 import numpy as np
 import pandas as pd
+from ase import Atoms
 from ase.io import read
 from ase.visualize import view
 from wrapcube import cleanUp
@@ -20,10 +21,10 @@ from ase.symbols import string2symbols, symbols2numbers
 #SWCNT.bath_geometry
 
 class bath:
-    def __init__(self, fname: str,supercell: tuple = (1,1,1), r_cutoff: float=0.0):
+    def __init__(self, atoms: Atoms):
         #wrap and center if vacuum exists
         #TODO: create a clean supercell with an origin at the center (low priority)
-        self.atoms=cleanUp(read(fname))*supercell
+        self.atoms=atoms
         #for atom species in atoms get isotope abundance data
         self.spin_table = get_spin_table(self.atoms)
         #randomly generate spin bath geometry based on % abundance
@@ -32,6 +33,11 @@ class bath:
         #TODO: determine spin site (sp3 carbon site 
         #(is this possible or do we need to ask user for e- spin site?))
         
+    @classmethod
+    #use cleanUp function to center atoms around surrounding vacuum 
+    def from_file(cls, filename: str, supercell: tuple = (1, 1, 1)):
+        return cls(cleanUp(read(filename))*supercell)
+    
 #for present atomic species get isotope data and return
 #a DataFrame with atomic number, atomic mass, percent abundance, nuclear_spin
 def get_spin_table(atoms):
@@ -109,7 +115,10 @@ def assign_isotopes(positions,isotope_df):
     return positions
 
 
-SWCNT=bath('CONTCAR_NO2',(1,1,3))
+# In[2]:
+
+
+SWCNT=bath.from_file('CONTCAR_NO2',(1,1,3))
 SWCNT.bath_geometry
 
 
