@@ -44,7 +44,7 @@ class bath:
         SWCNT.apply_r_cutoff(origin=[0,0,0], r=40)
         SWCNT.bath_geometry
     """
-    def __init__(self, atoms: Atoms):
+    def __init__(self, atoms: ase.Atoms):
         """
         Constructs all the necessary attributes for the bath object.
 
@@ -96,7 +96,7 @@ class bath:
         #remove sites beyond r_cutoff
         self.bath_geometry=self.bath_geometry[within_r_cutoff(self.bath_geometry.distance, r_cutoff=r)].copy()
 
-def get_spin_table(atoms):
+def get_spin_table(atoms: ase.Atoms):
     """
     for present atomic species get isotope data and return
     a DataFrame with atomic number, atomic mass, percent abundance, nuclear_spin
@@ -121,7 +121,7 @@ def get_spin_table(atoms):
 
 #return a DataFrame of spin active sites
 
-def generate_spin_sites(atoms,spin_table):
+def generate_spin_sites(atoms: ase.Atoms,spin_table: pd.DataFrame):
     """
     gives spin active sites as DataFrame based on isotopes 
     present based on positions and atomic species in atoms
@@ -178,7 +178,7 @@ def assign_isotopes(positions: pd.DataFrame,isotope_df: pd.DataFrame):
     return positions
 
 
-def get_unique_atomic_number(atoms: Atoms):
+def get_unique_atomic_number(atoms: ase.Atoms):
     return np.unique(atoms.get_atomic_numbers())
 
 def get_nuclear_spin(num_n: int,num_p: int):
