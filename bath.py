@@ -22,12 +22,12 @@ class bath:
 
     Attributes
     ----------
-    atoms : Atoms
+    atoms: 
         ase's Atoms object to get geometry
-    spin_table : DataFrame
+    spin_table: 
         contains atomic number, atomic mass, percent abundance, nuclear_spin
         of species present in self.atoms
-    bath_geometry : DataFrame
+    bath_geometry: 
         contains atomic symbol, isotope, xyz positions, nuclear spin(I),
         and the distance from e- Spin
 
@@ -36,6 +36,13 @@ class bath:
     apply_rcutoff(e_spin_position, cutoff_radius):
         remove sites beyond a certain radius from e- spin
         use when e- spin has been defined
+    
+    Usage Guide
+    -------
+        SWCNT=bath.from_file('CONTCAR_NO2',(1,1,3))
+        SWCNT.bath_geometry
+        SWCNT.apply_r_cutoff(origin=[0,0,0], r=40)
+        SWCNT.bath_geometry
     """
     def __init__(self, atoms: Atoms):
         """
@@ -43,8 +50,8 @@ class bath:
 
         Parameters
         ----------
-            atoms : Atoms
-                atoms read in
+            atoms:
+                atoms to make bath
         """
         self.atoms=atoms
         #for atom species in atoms get isotope abundance data
@@ -64,9 +71,9 @@ class bath:
 
         Parameters
         ----------
-            filename : str
+            filename: 
                 file name
-            repeat: tuple
+            repeat: 
                 multiple to multiply self.atoms to make supercell
         """
         return cls(cleanUp(read(filename))*repeat)
@@ -78,9 +85,9 @@ class bath:
 
         Parameters
         ----------
-            origin: np.ndarray
+            origin:
                 cart. position of e- spin 
-            r: float
+            r:
                 cutoff radius
         """
         #find distance from electron spin site (assuming at 0,0,0)
@@ -96,7 +103,7 @@ def get_spin_table(atoms):
     
     Parameters
     ----------
-        atoms: Atoms
+        atoms:
             atoms with elements to search for isotopes 
     """
     isotope_dfs=[]
@@ -121,7 +128,7 @@ def generate_spin_sites(atoms,spin_table):
     
     Parameters
     ----------
-        atoms: Atoms
+        atoms:
             atoms with elements to search for isotopes 
     """
     #make xyz-format df
@@ -148,8 +155,10 @@ def assign_isotopes(positions: pd.DataFrame,isotope_df: pd.DataFrame):
     
     Parameters
     ----------
-        positions: xyz format positions of one atomic species
-        isotope_df: spin_table of present isotopes of one atomic species
+        positions: 
+            xyz format positions of one atomic species
+        isotope_df: 
+            spin_table of present isotopes of one atomic species
         
     """
     #create randomly generated numbers from 0 to 1
@@ -185,10 +194,4 @@ def get_distance_from_point(positions: np.ndarray,ref: np.array=[0,0,0]):
 #r_cutoff in angstrom
 def within_r_cutoff(distance: np.array,r_cutoff: float=100):
     return distance <r_cutoff
-
-#usage guide
-#SWCNT=bath.from_file('CONTCAR_NO2',(1,1,3))
-#SWCNT.bath_geometry
-#SWCNT.apply_r_cutoff(origin=[0,0,0], r=40)
-#SWCNT.bath_geometry
 
