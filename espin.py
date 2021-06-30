@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[28]:
+# In[2]:
 
 
 import numpy as np
 from qutip import basis, spin_Jx, spin_Jy, spin_Jz
+from util import mu_B, hbar
 
 
 class espin:
@@ -31,7 +32,7 @@ class espin:
         sp3=espin(B=np.array([0,0,5]))
         sp3.hamiltonian
     """
-    def __init__(self, B, gyro: float = 2.0, position: np.array = [0,0,0]):
+    def __init__(self, B, gyro: float = 2.0037*mu_B/hbar, position: np.array = [0,0,0]):
         """
         Constructs all the necessary attributes for the espin object.
 
@@ -48,7 +49,7 @@ class espin:
         self.gyromagnetic_ratio = gyro
         self.position = position
         self.state = (basis(2,0)+basis(2,1)).unit()
-        self.hamiltonian = make_hamiltonian(self.gyromagnetic_ratio,self.mag_field)
+        self.hamiltonian = make_hamiltonian(self.gyromagnetic_ratio, self.mag_field)
         
 def make_hamiltonian(gyro: float,B: np.array):
     """
@@ -64,6 +65,19 @@ def make_hamiltonian(gyro: float,B: np.array):
         """
     S=np.array([spin_Jx(1/2), spin_Jy(1/2), spin_Jz(1/2)], 
         dtype=object)
-    H_ms = gyro* B@S
+    H_ms = gyro* B@S #unit of T * au
     return H_ms
+
+
+# In[3]:
+
+
+sp3=espin(B=np.array([0,0,5]))
+sp3.hamiltonian
+
+
+# In[ ]:
+
+
+
 
