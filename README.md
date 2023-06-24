@@ -3,9 +3,11 @@ calculate T2 in a system using the spin-diffusion model. We had started implemen
 
 ## file descriptions
 **espin.py** - central spin class - define electron spin Hamiltonian (ZFS, magnetic field splitting) ($H_s$).
+
 **spinbath.py** - bath spin class - define nuclear bath Hamiltonian (ZFS, magnetic field splitting, spin-spin interactions) ($H_b$).
+
 **bath.py** - bath class - reads in geometry file (rn CONTCAR), randomly assign isotope, retain only spin active site from a ref point with a cutoff radius.
-util:
+
 **wrapcube.py** - wrap and center code originally written for wrapping density in .cube files. 
 
 # Theoretical background
