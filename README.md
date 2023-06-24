@@ -2,11 +2,11 @@
 calculate T2 in a system using the spin-diffusion model. We had started implementing our own CCE code which produces the coherence function given a structure. Our Python package integrated with the atomic simulation environment (ASE) to quickly return geometric parameters and natural isotropic abundance data. To describe the spin hamiltonian in the basis of electron, nuclei spins we use the  Quantum Toolbox in Python package (QuTiP) package (https://github.com/qutip/qutip) which can handle basis, spin operators generation. QuTiP runs on a Cython engine which runs at C-code speed making it an attractive choice for linear algebra calculations. In 2021, Mykyta Onizhuk and Giulia Galli released their complete code, PyCCE,\cite{Onizhuk2021a} which led us to stop development of our code. 
 
 ## file descriptions
-espin.py - central spin class - define electron spin Hamiltonian (ZFS, magnetic field splitting) ($H_s$).
-spinbath.py - bath spin class - define nuclear bath Hamiltonian (ZFS, magnetic field splitting, spin-spin interactions) ($H_b$).
-bath.py - bath class - reads in geometry file (rn CONTCAR), randomly assign isotope, retain only spin active site from a ref point with a cutoff radius.
+**espin.py** - central spin class - define electron spin Hamiltonian (ZFS, magnetic field splitting) ($H_s$).
+**spinbath.py** - bath spin class - define nuclear bath Hamiltonian (ZFS, magnetic field splitting, spin-spin interactions) ($H_b$).
+**bath.py** - bath class - reads in geometry file (rn CONTCAR), randomly assign isotope, retain only spin active site from a ref point with a cutoff radius.
 util:
-wrapcube.py - wrap and center code originally written for wrapping density in .cube files. 
+**wrapcube.py** - wrap and center code originally written for wrapping density in .cube files. 
 
 # Theoretical background
 ## Spin Hamiltonian of a central spin
