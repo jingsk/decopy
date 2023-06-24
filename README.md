@@ -11,14 +11,15 @@ wrapcube.py - wrap and center code originally written for wrapping density in .c
 # Theoretical background
 ## Spin Hamiltonian of a central spin
 To account for interactions among the central spin and all the spin-active nuclei spins, we write out the interactions in the following way:
-$$\hat{H} = \hat{H}_S +\hat{H}_{SB}+\hat{H}_B$$,    
-where $\hat{H}_S$, $\hat{H}_{SB}$, and $\hat{H}_B$ are the spin Hamiltonians associated with the spin, the spin-bath interactions, and the bath. They are defined as follows
-$$\hat{H}_S = \mathbf{SDS}+\mathbf{B}\gamma_S \mathbf{S}$$,
-$$\hat{H}_{SB} = \sum_{I}\mathbf{S}\mathbf{A}_i\mathbf{I}_i$$,
-$$\hat{H}_{B} = \sum_{i}\mathbf{I}_i\mathbf{P}_i\mathbf{I}_i +\mathbf{B}\gamma_i \mathbf{I}_i+\sum_{I>j}\mathbf{I}_i\mathbf{J}_{ij}\mathbf{I}_j$$,
-$$\mathbf{J}_{ij}=\frac{\mu_0}{4\pi} \gamma_i \gamma_j \hbar^2\left ( \frac{\mathbf{\vec{I}}_i\cdot \mathbf{\vec{I}}_j}{|r_{ij|^3}}-\frac{3(\mathbf{\vec{I}}_i\cdot \vec{r}_{ij})(\mathbf{\vec{I}}_j\cdot \vec{r}_{ij})}{|r_{ij}|^5} \right )$$,
-with $\mathbf{S} = (\hat{S}_x,\hat{S}_y,\hat{S}_z)$ and $\mathbf{I} = (\hat{I}_x,\hat{I}_y,\hat{I}_z)$,the components of the spin operators of the central and a bath nuclei spin, $\gamma_S$ and $\gamma_i$, the gyromagnetic ratio of the central spin and of the nuclei index i., $A_i$, the hyperfine tensor between the central spin and the nuclei index I, $D$($P_i$), the self-interaction terms of the central spin, quadrupole tensor of nuclei i, $J_{ij}$, the interaction tensors between bath spins. Instead of calculating the hyperfine tensors explicitly in DFT for all nuclei, we use the point-dipole approximation to estimate the interactions. This assumption is valid for localized electron spins. Employing the point-dipole approximation,
-$$\mathbf{A}_{i}=\frac{\mu_0}{4\pi} \gamma_i \gamma_s \hbar^2\left ( \frac{\mathbf{I}_3}{|r_{i}|^3}-\frac{3(\vec{r}_{i}\otimes \vec{r}_{i})}{|r_{i}|^5} \right ),$$
+To account for interactions among the central spin and all the spin-active nuclei spins, we write out the interactions in the following way:
+$$\hat{H} = \hat{H}\_S +\hat{H}\_{SB}+\hat{H}\_B$$,    
+where $\hat{H}\_S$, $\hat{H}\_{SB}$, and $\hat{H}\_B$ are the spin Hamiltonians associated with the spin, the spin-bath interactions, and the bath. They are defined as follows
+$$\hat{H}\_S = \mathbf{SDS}+\mathbf{B}\gamma\_S \mathbf{S}$$,
+$$\hat{H}\_{SB} = \sum\_{I}\mathbf{S}\mathbf{A}\_i\mathbf{I}\_i$$,
+$$\hat{H}\_{B} = \sum\_{i}\mathbf{I}\_i\mathbf{P}\_i\mathbf{I}\_i +\mathbf{B}\gamma\_i \mathbf{I}\_i+\sum\_{I>j}\mathbf{I}\_i\mathbf{J}\_{ij}\mathbf{I}\_j$$,
+$$\mathbf{J}\_{ij}=\frac{\mu\_0}{4\pi} \gamma\_i \gamma\_j \hbar^2\left ( \frac{\mathbf{\vec{I}}\_i\cdot \mathbf{\vec{I}}\_j}{|r\_{ij|^3}}-\frac{3(\mathbf{\vec{I}}\_i\cdot \vec{r}\_{ij})(\mathbf{\vec{I}}\_j\cdot \vec{r}\_{ij})}{|r\_{ij}|^5} \right )$$,
+with $\mathbf{S} = (\hat{S}\_x,\hat{S}\_y,\hat{S}\_z)$ and $\mathbf{I} = (\hat{I}\_x,\hat{I}\_y,\hat{I}\_z)$,the components of the spin operators of the central and a bath nuclei spin, $\gamma\_S$ and $\gamma\_i$, the gyromagnetic ratio of the central spin and of the nuclei index i., $A\_i$, the hyperfine tensor between the central spin and the nuclei index I, $D$($P\_i$), the self-interaction terms of the central spin, quadrupole tensor of nuclei i, $J\_{ij}$, the interaction tensors between bath spins. Instead of calculating the hyperfine tensors explicitly in DFT for all nuclei, we use the point-dipole approximation to estimate the interactions. This assumption is valid for localized electron spins. Employing the point-dipole approximation,
+$$\mathbf{A}\_{i}=\frac{\mu\_0}{4\pi} \gamma\_i \gamma\_s \hbar^2\left ( \frac{\mathbf{I}\_3}{|r\_{i}|^3}-\frac{3(\vec{r}\_{i}\otimes \vec{r}\_{i})}{|r\_{i}|^5} \right ),$$
 
 where $\mathbf{I}$ is a 3x3 identity matrix.
 
